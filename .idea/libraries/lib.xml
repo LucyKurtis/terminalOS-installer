@@ -67,6 +67,7 @@
       <root url="jar://$PROJECT_DIR$/lib/groovy-templates-4.0.0.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/groovy-macro-4.0.0-sources.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/oshi-core-6.1.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/org.eclipse.jgit-6.2.0.202206071550-r.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

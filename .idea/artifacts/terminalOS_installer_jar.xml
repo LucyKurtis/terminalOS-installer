@@ -69,7 +69,7 @@
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/groovy-templates-4.0.0.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/groovy-macro-4.0.0-sources.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/oshi-core-6.1.4.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/out/artifacts/TerminalOS_Code_jar/TerminalOS Code.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/org.eclipse.jgit-6.2.0.202206071550-r.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

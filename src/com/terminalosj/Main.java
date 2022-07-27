@@ -1,4 +1,7 @@
 package com.terminalosj;
+import org.apache.commons.io.FileUtils;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.HardwareAbstractionLayer;
@@ -8,6 +11,7 @@ import java.lang.management.ManagementFactory;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
@@ -36,7 +40,7 @@ public class Main extends JFrame {
         cls();
         menulogo();
         System.out.println("\n What would you like to do?\n\n");
-        System.out.println(" I > Install or Update TerminalOS\n     " + Color.RED + "^ Requires git installed" + Color.RESET + "\n X > Exit");
+        System.out.println(" I > Install or Update TerminalOS\n     " + Color.RED + "^ Requires git installed" + Color.RESET + "\n S > Create Launch Scripts\n X > Exit");
         // user input
         Scanner Input = new Scanner(System.in);  // Create a Scanner object
         System.out.println("\n  Listening > ");
@@ -44,11 +48,14 @@ public class Main extends JFrame {
         String userinput = rawuserinput.replaceAll("\\s", "\\\\ ");
         String install = "I";
         String exit = "X";
+        String scripts = "S";
         if (userinput.equals(install)) {
             channel();
         } else if (userinput.equals(exit)) {
             cls();
             System.exit(0);
+        } else if (userinput.equals(scripts)) {
+            launchscripts();
         } else
         mainmenu();
     }
@@ -85,33 +92,126 @@ public class Main extends JFrame {
     // Installers
     static void release() throws IOException, InterruptedException, URISyntaxException {
         String homeFolder = System.getProperty("user.home");
-        new File(homeFolder + "/TerminalOS").mkdirs();
         cls();
         menulogo();
         System.out.println("\n Entering user home folder...");
         final String os = System.getProperty("os.name");
-        if (os.contains("Windows")) {
-            new ProcessBuilder("cmd", "/c", "cd " + homeFolder).inheritIO().start().waitFor();
-            System.out.println("\n Getting files from git...\n\n");
-            new ProcessBuilder("cmd", "/c", "git clone https://github.com/LucyKurtis/TerminalOS-Release").inheritIO().start().waitFor();
-        } else {
-            System.out.println("\n Getting files from git...\n\n");
-            //Runtime.getRuntime().exec("/bin/bash -c git clone https://github.com/LucyKurtis/TerminalOS-Release");
-            ProcessBuilder processBuilder = new ProcessBuilder();
-            processBuilder.command("bash", "-c", "git clone https://github.com/LucyKurtis/TerminalOS-Release");
-            System.out.println("\n\n Moving files to correct directory...");
-            Files.move(new File("TerminalOS-Release").toPath(), new File(homeFolder + "/TerminalOS").toPath(), StandardCopyOption.REPLACE_EXISTING);
+        // get github files
+        System.out.println("\n Clearing old files (if there are any...)");
+        FileUtils.deleteDirectory(new File(homeFolder + "/TerminalOS"));
+        System.out.println("\n Creating new directory...");
+        new File(homeFolder + "/TerminalOS").mkdirs();
+        System.out.println("\n Getting files from git, this may take a second...\n\n");
+        String repoUrl = "https://github.com/LucyKurtis/TerminalOS-Release.git";
+        String cloneDirectoryPath = homeFolder + "/TerminalOS"; // Ex.in windows c:\\gitProjects\SpringBootMongoDbCRUD\
+        try {
+            Git.cloneRepository()
+                    .setURI(repoUrl)
+                    .setDirectory(Paths.get(cloneDirectoryPath).toFile())
+                    .call();
+            System.out.println(Color.GREEN + " Got all files successfully!" + Color.RESET);
             onesecondpause();
-            System.out.println("\n Done!");
             onesecondpause();
-            mainmenu();
+        } catch (GitAPIException e) {
+            System.out.println(Color.RED + " Failed to get files from git:");
+            onesecondpause();
+            e.printStackTrace();
+            System.out.println(Color.RESET);
         }
+        mainmenu();
     }
-    static void beta() {
+    static void beta() throws IOException, InterruptedException, URISyntaxException {
+        String homeFolder = System.getProperty("user.home");
+        cls();
+        menulogo();
+        System.out.println("\n Entering user home folder...");
+        final String os = System.getProperty("os.name");
+        // get github files
+        System.out.println("\n Clearing old files (if there are any...)");
+        FileUtils.deleteDirectory(new File(homeFolder + "/TerminalOS"));
+        System.out.println("\n Creating new directory...");
+        new File(homeFolder + "/TerminalOS").mkdirs();
+        System.out.println("\n Getting files from git, this may take a second...");
+        String repoUrl = "https://github.com/LucyKurtis/TerminalOS-Beta.git";
+        String cloneDirectoryPath = homeFolder + "/TerminalOS"; // Ex.in windows c:\\gitProjects\SpringBootMongoDbCRUD\
+        try {
+            Git.cloneRepository()
+                    .setURI(repoUrl)
+                    .setDirectory(Paths.get(cloneDirectoryPath).toFile())
+                    .call();
+            System.out.println(Color.GREEN + " Got all files successfully!" + Color.RESET);
+            onesecondpause();
+            onesecondpause();
+        } catch (GitAPIException e) {
+            System.out.println(Color.RED + " Failed to get files from git:");
+            onesecondpause();
+            e.printStackTrace();
+            System.out.println(Color.RESET);
+        }
+        mainmenu();
     }
+    // Launch Scripts
+    static void launchscripts() throws URISyntaxException, IOException, InterruptedException {
+        cls();
+        String homeFolder = System.getProperty("user.home");
+        final String os = System.getProperty("os.name"); //detect OS
+        if (os.contains("Windows")) {
+            try { //create startup scripts for windows
+                String jarPath = Main.class
+                        .getProtectionDomain()
+                        .getCodeSource()
+                        .getLocation()
+                        .toURI()
+                        .getPath();
+                String jarPath2 = jarPath.substring(1);
+                File logo = new File(homeFolder + "\\LaunchTerminalOS.bat");
+                if (logo.createNewFile()) {
+                } else {
+                }
+            } catch (IOException e) {
+                System.out.println("Failed to create startup script");
+                e.printStackTrace();
+            }
+            // get JAR directory
+            String jarPath = Main.class
+                    .getProtectionDomain()
+                    .getCodeSource()
+                    .getLocation()
+                    .toURI()
+                    .getPath();
+            String jarPath2 = jarPath.substring(1);
+            Path batfileName = Path.of(homeFolder + "\\LaunchTerminalOS.bat");
+            String content  = "@echo off\ntitle TerminalOS\njava -jar " + homeFolder + "\\TerminalOS\\TerminalOS.jar" + "\npause";
+            Files.writeString(batfileName, content);
+            String actual = Files.readString(batfileName);
+            System.out.println("\n\n\n BATCH Launch File created in users home directory (" + homeFolder + ")");
+            System.out.println("  ^ You can move this wherever you would like");
+            onesecondpause();
+            onesecondpause();
 
-    //set directory
+        } else {
+            try { //create startup script for mac/linux
+                File logo = new File(homeFolder + "/Desktop/LaunchTerminalOS.sh");
+                if (logo.createNewFile()) {
+                } else {
+                }
+            } catch (IOException e) {
+                System.out.println("Failed to create setup file");
+                e.printStackTrace();
+            }
+            // get JAR directory
 
+            Path shfileName = Path.of(homeFolder + "/Desktop/LaunchTerminalOS.sh");
+            String content  = "#!/bin/sh\necho -n -e \"\\033]0;TerminalOS\\007\"\njava -jar " + homeFolder + "/TerminalOS/TerminalOS.jar";
+            Files.writeString(shfileName, content);
+            String actual = Files.readString(shfileName);
+            System.out.println("\n\n\n SH Launch File created on users Desktop.");
+            System.out.println("  ^ You can move this wherever you would like");
+            onesecondpause();
+            onesecondpause();
+        }
+        mainmenu();
+    }
 
     // small ASCII
     public static void logo() {

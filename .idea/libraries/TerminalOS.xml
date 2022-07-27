@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="TerminalOS">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/TerminalOS Legacy/TerminalOS.zip!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
