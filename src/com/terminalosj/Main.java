@@ -8,9 +8,12 @@ import java.lang.management.ManagementFactory;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 import oshi.software.os.OperatingSystem;
+import java.io.File;
+import static java.nio.file.StandardCopyOption.*;
 
 import javax.swing.JFrame;
 
@@ -21,38 +24,11 @@ public class Main extends JFrame {
         mainmenu();
     }
     static void startup() throws IOException, InterruptedException {
-
-        final String os = System.getProperty("os.name"); //detect OS
-        if (os.contains("Mac")) {
-            ProcessBuilder processBuilder = new ProcessBuilder();
-            processBuilder.command("bash", "-c", "printf '\\e[8;40;150t'").inheritIO().start().waitFor();
-        }
         cls();
         animlogoTOSlogo2();
         System.out.println("\n Booting...\n");
         loadingbar();
         cls();
-
-        //perform first time setup or replace missing files
-        String homeFolder = System.getProperty("user.home");
-        new File(homeFolder + "/TerminalOS-Data/Applications").mkdirs();
-        new File(homeFolder + "/TerminalOS-Data/SystemApps").mkdirs();
-        new File(homeFolder + "/TerminalOS-Data/Resources").mkdirs();
-        new File(homeFolder + "/TerminalOS-Data/Settings").mkdirs();
-        try { //create login txt
-            File login = new File(homeFolder + "/TerminalOS-Data/Settings/login.txt");
-            if (login.createNewFile()) {
-                System.out.println("File created: " + login.getName());
-            } else {
-                System.out.println("Login File Already Exists...");
-            }
-        } catch (IOException e) {
-            System.out.println("An error occurred.");
-            e.printStackTrace();
-        }
-        System.out.println("Working Directory = " + System.getProperty("user.dir"));
-        cls();
-
     }
 
     //Main Menu Application
@@ -60,21 +36,82 @@ public class Main extends JFrame {
         cls();
         menulogo();
         System.out.println("\n What would you like to do?\n\n");
-        System.out.println(" I > Install TerminalOS to your computer\n");
+        System.out.println(" I > Install or Update TerminalOS\n     " + Color.RED + "^ Requires git installed" + Color.RESET + "\n X > Exit");
+        // user input
         Scanner Input = new Scanner(System.in);  // Create a Scanner object
         System.out.println("\n  Listening > ");
         String rawuserinput = Input.next(); // Read user input
         String userinput = rawuserinput.replaceAll("\\s", "\\\\ ");
         String install = "I";
+        String exit = "X";
         if (userinput.equals(install)) {
-
+            channel();
+        } else if (userinput.equals(exit)) {
+            cls();
+            System.exit(0);
         } else
         mainmenu();
     }
+    // Channel Selection
+    static void channel() throws IOException, InterruptedException, URISyntaxException {
+        cls();
+        menulogo();
+        System.out.println("\n Select install channel:\n\n");
+        System.out.println(" R > Release" + Color.RED + "\n B > Beta" + Color.RESET + "\n\n C > Cancel");
+            // user input
+        Scanner Input = new Scanner(System.in);  // Create a Scanner object
+        System.out.println("\n  Listening > ");
+        String rawuserinput = Input.next(); // Read user input
+        String userinput = rawuserinput.replaceAll("\\s", "\\\\ ");
+        String Release = "R";
+        String Beta = "B";
+        String Cancel = "C";
+        if (userinput.equals(Release)) {
+            release();
+        } else if (userinput.equals(Beta)) {
+            beta();
+        } else if (userinput.equals(Cancel)) {
+            mainmenu();
+        } else {
 
+        }
+        final String os = System.getProperty("os.name");
+        if (os.contains("Windows")) {
+            new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+        } else {
+            System.out.print("\033\143");
+        }
+    }
+    // Installers
+    static void release() throws IOException, InterruptedException, URISyntaxException {
+        String homeFolder = System.getProperty("user.home");
+        new File(homeFolder + "/TerminalOS").mkdirs();
+        cls();
+        menulogo();
+        System.out.println("\n Entering user home folder...");
+        final String os = System.getProperty("os.name");
+        if (os.contains("Windows")) {
+            new ProcessBuilder("cmd", "/c", "cd " + homeFolder).inheritIO().start().waitFor();
+            System.out.println("\n Getting files from git...\n\n");
+            new ProcessBuilder("cmd", "/c", "git clone https://github.com/LucyKurtis/TerminalOS-Release").inheritIO().start().waitFor();
+        } else {
+            System.out.println("\n Getting files from git...\n\n");
+            //Runtime.getRuntime().exec("/bin/bash -c git clone https://github.com/LucyKurtis/TerminalOS-Release");
+            ProcessBuilder processBuilder = new ProcessBuilder();
+            processBuilder.command("bash", "-c", "git clone https://github.com/LucyKurtis/TerminalOS-Release");
+            System.out.println("\n\n Moving files to correct directory...");
+            Files.move(new File("TerminalOS-Release").toPath(), new File(homeFolder + "/TerminalOS").toPath(), StandardCopyOption.REPLACE_EXISTING);
+            onesecondpause();
+            System.out.println("\n Done!");
+            onesecondpause();
+            mainmenu();
+        }
+    }
+    static void beta() {
+    }
 
-    // -- LIBRARIES --
-    // big ASCII
+    //set directory
+
 
     // small ASCII
     public static void logo() {
@@ -230,8 +267,7 @@ public class Main extends JFrame {
         if (os.contains("Windows")) {
             new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
         } else {
-            System.out.print("clear");
-            System.out.flush();
+            System.out.print("\033\143");
         }
     }
     static void onesecondpause() {
