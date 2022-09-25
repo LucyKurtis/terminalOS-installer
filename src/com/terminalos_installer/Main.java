@@ -95,12 +95,12 @@ public class Main {
         final String os = System.getProperty("os.name");
         // get github files
         System.out.println("\n Clearing old files (if there are any...)");
-        FileUtils.deleteDirectory(new File(homeFolder + "/TerminalOS"));
+        FileUtils.deleteDirectory(new File(homeFolder + "/TerminalOS/Boot/Default"));
         System.out.println("\n Creating new directory...");
-        new File(homeFolder + "/TerminalOS").mkdirs();
-        System.out.println("\n Getting files from git, this may take a second...\n\n");
+        new File(homeFolder + "/TerminalOS/Boot/Default").mkdirs();
+        System.out.println("\n Getting OS files from git, this may take a second...\n\n");
         String repoUrl = "https://github.com/LucyKurtis/TerminalOS-Release.git";
-        String cloneDirectoryPath = homeFolder + "/TerminalOS"; // Ex.in windows c:\\gitProjects\SpringBootMongoDbCRUD\
+        String cloneDirectoryPath = homeFolder + "/TerminalOS/Boot/Default"; // Ex.in windows c:\\gitProjects\SpringBootMongoDbCRUD\
         try {
             Git.cloneRepository()
                     .setURI(repoUrl)
@@ -121,22 +121,22 @@ public class Main {
         String homeFolder = System.getProperty("user.home");
         cls();
         menulogo();
-        System.out.println("\n Entering user home folder...");
+        System.out.println(" Entering user home folder...");
         final String os = System.getProperty("os.name");
         // get github files
-        System.out.println("\n Clearing old files (if there are any...)");
-        FileUtils.deleteDirectory(new File(homeFolder + "/TerminalOS"));
-        System.out.println("\n Creating new directory...");
-        new File(homeFolder + "/TerminalOS").mkdirs();
-        System.out.println("\n Getting files from git, this may take a second...");
+        System.out.println(" Clearing old files (if there are any...)");
+        FileUtils.deleteDirectory(new File(homeFolder + "/TerminalOS/Boot/Images/Beta"));
+        System.out.println(" Creating new directory...");
+        new File(homeFolder + "/TerminalOS/Boot/Images/Beta").mkdirs();
+        System.out.println(" Getting OS files from git, this may take a second...");
         String repoUrl = "https://github.com/LucyKurtis/TerminalOS-Beta.git";
-        String cloneDirectoryPath = homeFolder + "/TerminalOS"; // Ex.in windows c:\\gitProjects\SpringBootMongoDbCRUD\
+        String cloneDirectoryPath = homeFolder + "/TerminalOS/Boot/Images/Beta";
         try {
             Git.cloneRepository()
                     .setURI(repoUrl)
                     .setDirectory(Paths.get(cloneDirectoryPath).toFile())
                     .call();
-            System.out.println(Color.GREEN + " Got all files successfully!" + Color.RESET);
+            System.out.println(Color.GREEN + " Got all OS files successfully!" + Color.RESET);
             onesecondpause();
             onesecondpause();
         } catch (GitAPIException e) {
@@ -145,6 +145,24 @@ public class Main {
             e.printStackTrace();
             System.out.println(Color.RESET);
         }
+        System.out.println("Updating BIOS...");
+        String booterdirectory = homeFolder + "/TerminalOS/Boot/BIOS";
+        try {
+            Git.cloneRepository()
+                    .setURI(repoUrl)
+                    .setDirectory(Paths.get(booterdirectory).toFile())
+                    .call();
+            System.out.println(Color.GREEN + " Got all BIOS files successfully!" + Color.RESET);
+            onesecondpause();
+            onesecondpause();
+        } catch (GitAPIException e) {
+            System.out.println(Color.RED + " Failed to get files from git:");
+            onesecondpause();
+            e.printStackTrace();
+            System.out.println(Color.RESET);
+        }
+        System.out.println("Updating Booter...");
+
         mainmenu();
     }
     // Launch Scripts
